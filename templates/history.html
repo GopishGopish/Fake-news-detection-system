@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction History - TruthVerify</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-shield-alt me-2"></i>TruthVerify
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/predict">Analyze</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/history">History</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <h2 class="fw-bold mb-4 text-white">Your Analysis History</h2>
+        <div class="card animate-fade border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0">
+                        <thead>
+                            <tr class="text-secondary text-uppercase" style="font-size: 0.8rem;">
+                                <th class="px-4 py-3">News Sample</th>
+                                <th class="py-3">Prediction</th>
+                                <th class="py-3">Confidence</th>
+                                <th class="py-3">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in history %}
+                            <tr>
+                                <td class="px-4 py-3">
+                                    <small class="text-white-50">{{ item.news_text[:100] }}...</small>
+                                </td>
+                                <td class="py-3">
+                                    <span class="badge {% if item.prediction == 'REAL' %}bg-success{% else %}bg-danger{% endif %} ps-2 pe-2 pt-1 pb-1">
+                                        {{ item.prediction }}
+                                    </span>
+                                </td>
+                                <td class="py-3">
+                                    <span class="fw-bold">{{ "%.1f"|format(item.confidence) }}%</span>
+                                </td>
+                                <td class="py-3 text-white-50">
+                                    <small>{{ item.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-white-50">
+                                    No history found. <a href="/predict" class="text-primary">Start analyzing</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

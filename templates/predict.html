@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyze News - TruthVerify</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-shield-alt me-2"></i>TruthVerify
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/predict">Analyze</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/history">History</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category }} alert-dismissible fade show animate-fade" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
+                <div class="card animate-fade shadow-lg border-0">
+                    <div class="card-body p-5">
+                        <h2 class="fw-bold text-center mb-4 text-white">News Content Analysis</h2>
+                        <p class="text-center text-white-50 mb-5">Paste the news article or headline below to check its authenticity.</p>
+                        
+                        <form method="POST">
+                            <div class="mb-4">
+                                <textarea class="form-control" name="news_content" id="news_content" rows="8" placeholder="Start typing or paste news content here..." required>{{ news_input }}</textarea>
+                            </div>
+                            <div class="d-grid shadow-sm">
+                                <button type="submit" class="btn btn-primary btn-lg" id="analyzeBtn">
+                                    <span id="btnText"><i class="fas fa-search me-2"></i>Analyze Now</span>
+                                    <span id="btnLoading" class="d-none">
+                                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Analyzing...
+                                    </span>
+                                </button>
+                            </div>
+                        </form>
+
+                        <script>
+                            document.querySelector('form').addEventListener('submit', function() {
+                                document.getElementById('btnText').classList.add('d-none');
+                                document.getElementById('btnLoading').classList.remove('d-none');
+                                document.getElementById('analyzeBtn').disabled = true;
+                            });
+                        </script>
+
+                        {% if prediction %}
+                        <div class="mt-5 text-center p-4 rounded-3 border-dashed border-2 animate-fade">
+                            <h4 class="mb-3 text-secondary">Analysis Result</h4>
+                            
+                            <div class="result-badge {% if prediction == 'REAL' %}badge-real{% else %}badge-fake{% endif %}">
+                                <i class="fas {% if prediction == 'REAL' %}fa-check-circle{% else %}fa-times-circle{% endif %} me-2"></i>
+                                {{ prediction }} NEWS
+                            </div>
+
+                            <div class="mt-4">
+                                <p class="text-white-50 mb-1">Confidence Score</p>
+                                <div class="progress mx-auto" style="width: 50%;">
+                                    <div class="progress-bar {% if prediction == 'REAL' %}bg-success{% else %}bg-danger{% endif %}" 
+                                         role="progressbar" 
+                                         style="width: {{ confidence }}%" 
+                                         aria-valuenow="{{ confidence }}" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <span class="fw-bold mt-2 d-block">{{ "%.2f"|format(confidence) }}%</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center mt-5">
+        <div class="container">
+            <p>&copy; 2024 TruthVerify Fake News Detection System.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
